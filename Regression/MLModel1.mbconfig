@@ -1,0 +1,175 @@
+﻿{
+  "TrainingTime": 10,
+  "Scenario": "Regression",
+  "DataSource": {
+    "Type": "TabularFile",
+    "Version": 1,
+    "FilePath": "C:\\Users\\nnesh\\source\\repos\\Web\\MlTesting\\Regression\\testJudje.csv",
+    "Delimiter": ",",
+    "DecimalMarker": ".",
+    "HasHeader": true,
+    "ColumnProperties": [
+      {
+        "ColumnName": "judge",
+        "ColumnPurpose": "Feature",
+        "ColumnDataFormat": "String",
+        "IsCategorical": true,
+        "Type": "Column",
+        "Version": 2
+      },
+      {
+        "ColumnName": "typeCase",
+        "ColumnPurpose": "Feature",
+        "ColumnDataFormat": "String",
+        "IsCategorical": true,
+        "Type": "Column",
+        "Version": 2
+      },
+      {
+        "ColumnName": "reason",
+        "ColumnPurpose": "Feature",
+        "ColumnDataFormat": "String",
+        "IsCategorical": true,
+        "Type": "Column",
+        "Version": 2
+      },
+      {
+        "ColumnName": "claimАmount",
+        "ColumnPurpose": "Feature",
+        "ColumnDataFormat": "Single",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 2
+      },
+      {
+        "ColumnName": "amountАwarded",
+        "ColumnPurpose": "Label",
+        "ColumnDataFormat": "Single",
+        "IsCategorical": false,
+        "Type": "Column",
+        "Version": 2
+      }
+    ]
+  },
+  "Environment": {
+    "Type": "LocalCPU",
+    "Version": 1
+  },
+  "RunHistory": {
+    "Version": 1,
+    "Type": "Result",
+    "Trials": [
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "FastForestRegression",
+        "Score": 0.79159196277372934,
+        "RuntimeInSeconds": 1.6829999685287476
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "FastTreeTweedieRegression",
+        "Score": -2.3708507013771967,
+        "RuntimeInSeconds": 1.7359999418258667
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "FastTreeRegression",
+        "Score": -0.81891376847948261,
+        "RuntimeInSeconds": 1.6299999952316284
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "SdcaRegression",
+        "Score": 0.050670216482708738,
+        "RuntimeInSeconds": 0.43700000643730164
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "FastForestRegression",
+        "Score": 0.77044307119189748,
+        "RuntimeInSeconds": 1.8389999866485596
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "LightGbmRegression",
+        "Score": 0.81426324236054093,
+        "RuntimeInSeconds": 0.335999995470047
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "LbfgsPoissonRegressionRegression",
+        "Score": 0.046987422552739008,
+        "RuntimeInSeconds": 0.25699999928474426
+      },
+      {
+        "Version": 0,
+        "Type": "Trial",
+        "TrainerName": "FastTreeRegression",
+        "Score": -1.6815515149659839,
+        "RuntimeInSeconds": 1.99399995803833
+      }
+    ],
+    "Pipeline": {
+      "parameter": {
+        "0": {
+          "OutputColumnNames": [
+            "judge",
+            "typeCase",
+            "reason"
+          ],
+          "InputColumnNames": [
+            "judge",
+            "typeCase",
+            "reason"
+          ]
+        },
+        "1": {
+          "OutputColumnNames": [
+            "claimАmount"
+          ],
+          "InputColumnNames": [
+            "claimАmount"
+          ]
+        },
+        "2": {
+          "InputColumnNames": [
+            "judge",
+            "typeCase",
+            "reason",
+            "claimАmount"
+          ],
+          "OutputColumnName": "Features"
+        },
+        "3": {
+          "NumberOfLeaves": 4,
+          "MinimumExampleCountPerLeaf": 20,
+          "LearningRate": 1.0,
+          "NumberOfTrees": 4,
+          "SubsampleFraction": 1.0,
+          "MaximumBinCountPerFeature": 255,
+          "FeatureFraction": 1.0,
+          "L1Regularization": 2E-10,
+          "L2Regularization": 1.0,
+          "LabelColumnName": "amountАwarded",
+          "FeatureColumnName": "Features"
+        }
+      },
+      "estimators": [
+        "OneHotEncoding",
+        "ReplaceMissingValues",
+        "Concatenate",
+        "LightGbmRegression"
+      ]
+    },
+    "MetricName": "RSquared"
+  },
+  "Type": "TrainingConfig",
+  "Version": 2
+}

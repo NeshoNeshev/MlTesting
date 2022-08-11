@@ -9,15 +9,15 @@ if (!File.Exists(modelFile))
     TrainModel(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp1\case-train-data.csv", modelFile);
 }
 
-var testModelData = new List<string>
-{
-                                        "да си осиновя дете",
-                                        "Арест",
-                                        "Родителски права",
-                                        "откраднаха ми музиката",
-                                        " употреба на наркотици",
-                                        "използва музиката ми без позволение"
-                                    };
+//var testModelData = new List<string>
+//{
+//                                        "да си осиновя дете",
+//                                        "Арест",
+//                                        "Родителски права",
+//                                        "откраднаха ми музиката",
+//                                        " употреба на наркотици",
+//                                        "използва музиката ми без позволение"
+//                                    };
 
 
 
@@ -52,8 +52,18 @@ static void TrainModel(string dataFile, string modelFile)
     Console.WriteLine($"Save the model to a file ({modelFile})");
     context.Model.Save(trainedModel, trainingDataView.Schema, modelFile);
 }
-Console.WriteLine("Въведете случай:");
-TestModel(modelFile, Console.ReadLine());
+
+
+while (true)
+{
+    Console.WriteLine("Въведете случай:");
+    var input = Console.ReadLine();
+    if (input == "стоп") break;
+    TestModel(modelFile, input);
+}
+
+
+
 static void TestModel(string modelFile, string input)
 {
     var context = new MLContext();
