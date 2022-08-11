@@ -1,5 +1,6 @@
 ﻿
 using ConsoleApp2;
+using Data;
 using System.Net;
 using System.Text;
 using UglyToad.PdfPig;
@@ -7,6 +8,8 @@ using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.ReadingOrderDetector;
 using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
+
+var context = new ApplicationDbContext();
 
 //using (PdfDocument document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\act_2022_8_1. (1).pdf"))
 //{
@@ -82,11 +85,10 @@ using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 //    }
 //}
 
+ResetDatabase(context, shouldDropDatabase: true);
 
 var cases = new List<string>();
 var parser = new HtmlParser();
-
-
 
 string reshenie = "5001";
 string prisada = "5003";
@@ -129,4 +131,18 @@ using (var document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesti
             Console.WriteLine("------", 60);
         }
     }
+}
+void ResetDatabase(ApplicationDbContext context, bool shouldDropDatabase = false)
+{
+    if (shouldDropDatabase)
+    {
+        context.Database.EnsureDeleted();
+    }
+
+    if (context.Database.EnsureCreated())
+    {
+        return;
+    }
+
+    
 }
