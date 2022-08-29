@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data
 {
-    public static class Configuration
+    public static class ConfigurationData
     {
         public static string ConnectionString = @"Server=.;Database=TestMl;Trusted_Connection=True;MultipleActiveResultSets=true";
     }

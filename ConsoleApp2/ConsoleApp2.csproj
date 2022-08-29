@@ -11,6 +11,7 @@
     <PackageReference Include="AngleSharp" Version="0.17.1" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="GhostScript.NetCore" Version="1.0.1" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.45" />
     <PackageReference Include="iTextSharp.LGPLv2.Core" Version="1.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
@@ -18,16 +19,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NEST" Version="7.17.4" />
     <PackageReference Include="PdfPig" Version="0.1.6" />
     <PackageReference Include="PDFTron.NET.x64" Version="9.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="pdfs\" />
+    <ProjectReference Include="..\Data\Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Data\Data.csproj" />
+    <Folder Include="pdfs\" />
   </ItemGroup>
 
 </Project>

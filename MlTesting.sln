@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Regression", "Regression\Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLModel1_Case", "MLModel1_Case\MLModel1_Case.csproj", "{13244FAB-EFF1-4F6B-9C7C-56E1DB7BEFEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{755D9953-75ED-4C45-A032-E8BF5CF2DDC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{755D9953-75ED-4C45-A032-E8BF5CF2DDC1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLModel1_ConsoleApp121", "MLModel1_ConsoleApp121\MLModel1_ConsoleApp121.csproj", "{1A58E4A9-9A65-4A1F-8A5E-5DBE1752A0F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{755D9953-75ED-4C45-A032-E8BF5CF2DDC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{755D9953-75ED-4C45-A032-E8BF5CF2DDC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{755D9953-75ED-4C45-A032-E8BF5CF2DDC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A58E4A9-9A65-4A1F-8A5E-5DBE1752A0F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A58E4A9-9A65-4A1F-8A5E-5DBE1752A0F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A58E4A9-9A65-4A1F-8A5E-5DBE1752A0F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A58E4A9-9A65-4A1F-8A5E-5DBE1752A0F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

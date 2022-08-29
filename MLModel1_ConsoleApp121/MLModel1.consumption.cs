@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-namespace Regression
+namespace MLModel1_ConsoleApp121
 {
     public partial class MLModel1
     {

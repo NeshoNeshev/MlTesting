@@ -8,7 +8,7 @@ using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
 using Microsoft.ML;
 
-namespace Regression
+namespace MLModel1_ConsoleApp121
 {
     public partial class MLModel1
     {
