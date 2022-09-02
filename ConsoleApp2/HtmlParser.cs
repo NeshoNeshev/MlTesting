@@ -1,14 +1,9 @@
-﻿
-using AngleSharp;
+﻿using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using Data;
 using HtmlAgilityPack;
-using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.Linq;
 
 namespace ConsoleApp2
 {
@@ -36,14 +31,14 @@ namespace ConsoleApp2
             }
             using var context = BrowsingContext.New(Configuration.Default);
             using var doc = await context.OpenAsync(req => req.Content(html));
-            
+
             var anchors = doc.GetElementsByTagName("a");
-           
+
             var urls = new List<string>();
             for (var i = 0; i < anchors.Length; i++)
-            {     
+            {
                 var anchor = anchors[i] as IHtmlAnchorElement;
-                
+
                 if (anchor.Href != null && anchor.Href.Contains("https://portalextensions"))
                 {
                     var right = anchor.TextContent;
@@ -52,7 +47,7 @@ namespace ConsoleApp2
                     {
                         Console.WriteLine(anchor.TextContent);
                         urls.Add(anchor.Href);
-                    }                  
+                    }
                 }
             }
             return urls;
@@ -62,7 +57,7 @@ namespace ConsoleApp2
             var files = new DownloadFiles();
             var url = String.Format(urlAddress, startDate, endDate, code);
             var result = await files.Download(url);
-           
+
             string html = "";
             using (HttpClient client = new HttpClient())
             {
@@ -76,6 +71,7 @@ namespace ConsoleApp2
             }
             using var context = BrowsingContext.New(Configuration.Default);
             using var doc = await context.OpenAsync(req => req.Content(html));
+ 
             var td = doc.QuerySelectorAll("td");
             byte counter = 0;
             var test = new List<string>();
@@ -97,6 +93,7 @@ namespace ConsoleApp2
                     {
                         var curent = result.Dequeue();
                         var text = String.Empty;
+                        var judje = this.context1.Judjes.FirstOrDefault(x => x.Name.ToLower() == test[5].Trim().ToLower());
                         if (curent.Contains("html"))
                         {
                             text = HtmlParse(curent);
@@ -104,18 +101,30 @@ namespace ConsoleApp2
                             int index = text.IndexOf("РЕШИ:");
                             if (index != -1)
                             {
+                                if (judje == null)
+                                {
+                                    judje = new Judje()
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        Name = test[5].ToUpper()
+                                    };
+                                    await this.context1.Judjes.AddAsync(judje);
+                                }
+
+                                var content = text?.Substring(0, index).Trim();
+                                var answer = text?.Substring(index).Trim();
                                 var newCase = new Case()
                                 {
                                     Id = Guid.NewGuid().ToString(),
-
                                     TypeOfCase = test[1],
                                     CaseNumber = test[2],
                                     TypeOfAct = test[6],
-                                    Content = text?.Substring(0, index).Trim(),
-                                    Answer = text?.Substring(index).Trim()
+                                    Content = content,
+                                    Answer = answer,
+                                    JudjeId = judje.Id
                                 };
                                 counter = 0;
-                                this.context1.Cases.Add(newCase);
+                                await this.context1.Cases.AddAsync(newCase);
                                 await this.context1.SaveChangesAsync();
                                 File.Delete(curent);
                             }
@@ -124,7 +133,6 @@ namespace ConsoleApp2
                                 counter = 0;
                                 File.Delete(curent);
                             }
-                            
                         }
                         else
                         {
@@ -133,19 +141,33 @@ namespace ConsoleApp2
                             int index = text.IndexOf("РЕШИ:");
                             if (index != -1)
                             {
+
+                                if (judje == null)
+                                {
+                                    judje = new Judje()
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        Name = test[5].ToUpper()
+                                    };
+                                    await this.context1.Judjes.AddAsync(judje);
+                                }
+
+                                var content = text?.Substring(0, index).Trim();
+                                var answer = text?.Substring(index).Trim();
                                 var newCase = new Case()
                                 {
                                     Id = Guid.NewGuid().ToString(),
-
                                     TypeOfCase = test[1],
                                     CaseNumber = test[2],
                                     TypeOfAct = test[6],
-                                    Content = text?.Substring(0, index).Trim(),
-                                    Answer = text?.Substring(index).Trim()
+                                    Content = content,
+                                    Answer = answer,
+                                    JudjeId = judje.Id,
+                                    Decision = FindText(answer)
                                 };
-                                //йкхйк
+
                                 counter = 0;
-                                this.context1.Cases.Add(newCase);
+                                await this.context1.Cases.AddAsync(newCase);
                                 await this.context1.SaveChangesAsync();
                                 File.Delete(curent);
                             }
@@ -154,9 +176,7 @@ namespace ConsoleApp2
                                 counter = 0;
                                 File.Delete(curent);
                             }
-                           
                         }
-                        //var existJudje = test[5];
                     }
                     test = new List<string>();
                 }
@@ -178,12 +198,92 @@ namespace ConsoleApp2
             foreach (HtmlNode paragraph in document.DocumentNode.SelectNodes("//p"))
             {
                 htmlCode = paragraph.InnerText;
-               
+
                 builder.Append(htmlCode.Trim());
-                Console.WriteLine(htmlCode);
+                
             }
             var text = PdfExtractor.ReplaceText(builder.ToString());
             return text;
-        }      
+        }
+        private string FindText(string text)
+        {
+            var result = String.Empty;
+            var array = text.Split(" ");
+
+            if (text.Contains("ПРИЕМА ЗА УСТАНОВЕНО", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ПРИЕМА ЗА УСТАНОВЕНО";
+            }
+            else if (text.Contains("НАЛАГА мерки за защита", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "НАЛАГА мерки за защита";
+            }
+            else if (text.Contains("ДОПУСКА РАЗВОД", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ДОПУСКА РАЗВОД";
+            }
+            else if (text.Contains("ОТХВЪРЛЯ иск", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ОТХВЪРЛЯ ИСКА";
+            }
+            else if (text.Contains("ПРЕДОСТАВЯ упражняването на родителските права", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ПРЕДОСТАВЯ упражняването на родителските права";
+            }
+            else if (text.Contains("ПРЕКРАТЯВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ПРЕКРАТЯВА";
+            }
+            else if (text.Contains("ОТМЕНЯ", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ОТМЕНЯ";
+            }
+            else if (text.Contains("ПОТВЪРЖДАВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ПОТВЪРЖДАВА";
+            }
+            else if (text.Contains("ИЗМЕНЯ", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ИЗМЕНЯ";
+            }
+
+            else if (text.Contains("ОСЪЖДА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ОСЪЖДА";
+            }
+            else if (text.Contains("ОТХВЪРЛЯ", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ОТХВЪРЛЯ";
+            }
+            else if (text.Contains("ОТМЕНЯВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ОТМЕНЯ";
+            }
+            else if (text.Contains("УТВЪРЖДАВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "УТВЪРЖДАВА";
+            }
+            else if (text.Contains("ПРИЗНАВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ПРИЗНАВА";
+            }
+            else if (text.Contains("ЗАДЪЛЖАВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ЗАДЪЛЖАВА";
+            }
+            else if (text.Contains("НАСТАНЯВА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "НАСТАНЯВА";
+            }
+            else if (text.Contains("ДОПУСКА", StringComparison.OrdinalIgnoreCase))
+            {
+                result = "ДОПУСКА";
+            }
+            else
+            {
+                result = "ПРОМЕНИ!!";
+            }
+            return result;
+        }
     }
 }

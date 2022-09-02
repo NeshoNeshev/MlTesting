@@ -19,6 +19,7 @@ namespace ConsoleApp2
             var dir = @"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\pdfs\";
             var directories = new List<string>();
             var queue = new Queue<string>();
+
             using (var client = new WebClient())
             {
                 for (int i = 0; i < result.Count; i++)
@@ -40,10 +41,8 @@ namespace ConsoleApp2
                         client.DownloadFile($"{result[i]}", dir + $"{i}.pdf");
                         queue.Enqueue(dir + $"{i}.pdf");
                        
-                    }
-                   
+                    }                  
                 } 
-
             }
             return queue;
         }

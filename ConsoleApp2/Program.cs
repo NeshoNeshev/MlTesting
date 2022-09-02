@@ -1,13 +1,6 @@
 ﻿using ConsoleApp2;
 using Data;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
-using System.Text;
-using UglyToad.PdfPig;
-using UglyToad.PdfPig.Content;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.PageSegmenter;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.ReadingOrderDetector;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 
 var context = new ApplicationDbContext();
 //ResetDatabase(context, shouldDropDatabase: true);
@@ -98,21 +91,29 @@ var context = new ApplicationDbContext();
 //}
 
 
-ResetDatabase(context, shouldDropDatabase: true);
+//ResetDatabase(context, shouldDropDatabase: true);
 
 //var cases = new List<string>();
-var parser = new HtmlParser(context);
-string reshenie = "5001";
-string prisada = "5003";
-string sporazumenie = "5004";
-string url = "https://burgas-rs.justice.bg/bg/5335?from={0}&to={1}&actkindcode={2}&casenumber=&caseyear=&casetype=";
+//var parser = new HtmlParser(context);
+//string reshenie = "5001";
+//string prisada = "5003";
+//string sporazumenie = "5004";
+//string url = "https://burgas-rs.justice.bg/bg/5335?from={0}&to={1}&actkindcode={2}&casenumber=&caseyear=&casetype=";
 
-await parser.JudjeParseAsync("27.07.2021", "27.07.2021", reshenie, url);
+//await parser.JudjeParseAsync("01.08.2021", "31.08.2021", reshenie, url);
+var search = "предаване на стоката или на документите";
+var words = search?.Split(' ').Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x) && x.Length >= 2).ToList();
 
- 
+var result = context.Cases.Where(x=>x.Id != null);
 
-
-
+foreach (var word in words)
+{
+    result = context.Cases.Where(x => EF.Functions.FreeText(x.Content, word));
+    //// query = query.Where(x => x.SearchText.Contains(word));
+}
+var asdsa = result.ToList();
+Console.WriteLine("");
 //var allPdfBlocks = new List<string>();
 //using (var document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\2604-2022.pdf"))
 //{

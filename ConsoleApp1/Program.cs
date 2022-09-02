@@ -1,12 +1,14 @@
 ﻿using ConsoleApp1;
+using Microsoft.Data.SqlClient;
 using Microsoft.ML;
+using Microsoft.ML.Data;
 using System.Text;
 
 Console.OutputEncoding = Encoding.UTF8;
 var modelFile = "CaseCategoryModel.zip";
 if (!File.Exists(modelFile))
 {
-    TrainModel(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp1\case-train-data.csv", modelFile);
+    TrainModel( modelFile);
 }
 
 //var testModelData = new List<string>
@@ -21,18 +23,25 @@ if (!File.Exists(modelFile))
 
 
 
-static void TrainModel(string dataFile, string modelFile)
+static void TrainModel(string modelFile)
 {
     // Create MLContext to be shared across the model creation workflow objects
     var context = new MLContext(seed: 0);
+    DatabaseLoader loader = context.Data.CreateDatabaseLoader<CaseData>();
+    string connectionString = @"Server=.;Database=TestMl;Trusted_Connection=True;MultipleActiveResultSets=true";
 
+    string sqlCommand = "SELECT  Decision, Answer,Content, TypeOfCase FROM Cases";
+    
+    DatabaseSource dbSource = new DatabaseSource(SqlClientFactory.Instance, connectionString, sqlCommand);
+
+    IDataView data = loader.Load(dbSource);
     // Loading the data
-    Console.WriteLine($"Loading the data ({dataFile})");
-    var trainingDataView = context.Data.LoadFromTextFile<CaseModel>(dataFile, ',', true, true, true);
-
+   
+    var trainingDataView = data;
+    
     // Common data process configuration with pipeline data transformations
     Console.WriteLine("Map raw input data columns to ML.NET data");
-    var dataProcessPipeline = context.Transforms.Conversion.MapValueToKey("Label", nameof(CaseModel.Category))
+    var dataProcessPipeline = context.Transforms.Conversion.MapValueToKey("Label", nameof(CaseModel.Answer))
         .Append(context.Transforms.Text.FeaturizeText("Features", nameof(CaseModel.Content)));
 
     // Create the selected training algorithm/trainer
@@ -58,21 +67,22 @@ while (true)
 {
     Console.WriteLine("Въведете случай:");
     var input = Console.ReadLine();
+    var type = Console.ReadLine();
     if (input == "стоп") break;
-    TestModel(modelFile, input);
+    TestModel(modelFile, input, type);
 }
 
 
 
-static void TestModel(string modelFile, string input)
+static void TestModel(string modelFile, string input, string type)
 {
     var context = new MLContext();
     var model = context.Model.Load(modelFile, out _);
     var predictionEngine = context.Model.CreatePredictionEngine<CaseModel, OutputModel>(model);
-    var prediction = predictionEngine.Predict(new CaseModel { Content = input });
+    var prediction = predictionEngine.Predict(new CaseModel { Content = input, TypeOfCase = type });
     Console.WriteLine(new string('-', 60));
     Console.WriteLine($"Content: {input}");
-    Console.WriteLine($"Prediction: {prediction.Category}");
+    Console.WriteLine($"Prediction: {prediction.Answear}");
     Console.WriteLine($"Score: {prediction.Score.Max()}");
     //foreach (var testData in testModelData)
     //{
