@@ -20,6 +20,10 @@
 
         public string? Decision { get; set; }
 
+        public string? Motives { get; set; }
+
+        public string? FullText { get; set; }
+
         public string? JudjeId { get; set; }
 
         public virtual Judje? Judje { get; set; }

@@ -1,145 +1,69 @@
 ﻿using ConsoleApp2;
 using Data;
-using Microsoft.EntityFrameworkCore;
+using HtmlAgilityPack;
+using System.Text;
+using UglyToad.PdfPig;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.WordExtractor;
 
 var context = new ApplicationDbContext();
 //ResetDatabase(context, shouldDropDatabase: true);
-//var files = new DownloadFiles();
-//var result = await files.Download();
-//string criteria = "нормативни актове";  
-//var asa = context.Cases.Where(x=> EF.Functions.Contains(x.Content, criteria)).ToList();
-//var sdasd = ";";
-//using (var document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\act_2022_8_1. (1).pdf"))
+
+
+//Dictionary<string, int> wordCounts = new Dictionary<string, int>();
+//var dbs = context.Cases.Select(x => x.Content).ToList();
+
+//foreach (var item in dbs)
 //{
-//    for (var i = 0; i < document.NumberOfPages; i++)
+//    var words = item.Split(" ").ToList();
+//    foreach (var word in words)
 //    {
-//        var page = document.GetPage(i + 1);
-
-//        var words = page.GetWords(NearestNeighbourWordExtractor.Instance);
-
-//        foreach (var word in words)
+//        if (!wordCounts.ContainsKey(word))
 //        {
-//            Console.WriteLine(word);
+//            wordCounts.Add(word, 1);
+//        }
+//        else
+//        {
+//            wordCounts[word]++;
 //        }
 //    }
 //}
 
-
-//get leters and create string text
-//using (PdfDocument document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\2604-2022.pdf"))
+//foreach (var kvp in wordCounts.OrderByDescending(x => x.Value).Where(x => x.Value > 50))
 //{
-//    //var example = new List<string>();
-//    foreach (Page page in document.GetPages())
-//    {
-//        IReadOnlyList<Letter> letters = page.Letters;
-
-//        var example = string.Join(string.Empty, letters.Select(x => x.Value));
-
-//        Console.WriteLine(example);
-//        //Console.WriteLine("...........................................");
-//        IEnumerable<Word> words = page.GetWords();
-//    }
-//    Console.WriteLine("hkjjjkhj");
-//}
-
-
-//using (var document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\act_2022_8_1. (1).pdf"))
-//{
-//    for (var i = 0; i < document.NumberOfPages; i++)
-//    {
-//        var page = document.GetPage(i + 1);
-
-//        var words = page.GetWords(NearestNeighbourWordExtractor.Instance).ToArray();
-//        var sb = new List<string>();
-//        foreach (var word in words)
-//        {
-//            if (String.IsNullOrWhiteSpace(word.ToString()))
-//            {
-//                continue;
-//            }
-//            sb.Add(word.ToString());
-//        }
-//        Console.WriteLine(sb[0]);
-//    }
-//}
-//var wordss = new List<string>() { "УТВЪРЖДАВА", "ОСЪЖДА", "ОТМЕНЯ", "ПОТВЪРЖДАВА", "НАЛАГА", "ДОПУСКА РАЗВОД" };
-//var sasa = "test.pdf";
-//var filePath = @$"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\pdfs\{sasa}";
-//using (var document = PdfDocument.Open(filePath))
-//{
-//    var builder = new StringBuilder();
-//    var list = new List<string>();
-//    for (var i = 0; i < document.NumberOfPages; i++)
-//    {
-//        var page = document.GetPage(i + 1);
-
-//        var words = page.GetWords(NearestNeighbourWordExtractor.Instance);
-
-//        foreach (var word in words)
-//        {
-//            if (String.IsNullOrWhiteSpace(word.ToString()))
-//            {
-//                continue;
-//            }
-//            list.Add(word.ToString());
-//            builder.Append(word);
-//            builder.Append(" ");
-//        }
-//    }
-//    Console.WriteLine(builder);
+//    //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+//    Console.WriteLine($"\"{kvp.Key}\","+$"value: {kvp.Value}");
 
 //}
-
-
-//ResetDatabase(context, shouldDropDatabase: true);
 
 //var cases = new List<string>();
-//var parser = new HtmlParser(context);
+var parser = new HtmlParser(context);
+
+//var url = "C:\\Users\\nnesh\\source\\repos\\Web\\MlTesting\\ConsoleApp2\\pdfs\\act_2021_4_13. (6).html";
+//parser.HtmlParse(url);
+
 //string reshenie = "5001";
 //string prisada = "5003";
 //string sporazumenie = "5004";
 //string url = "https://burgas-rs.justice.bg/bg/5335?from={0}&to={1}&actkindcode={2}&casenumber=&caseyear=&casetype=";
 
-//await parser.JudjeParseAsync("01.08.2021", "31.08.2021", reshenie, url);
-var search = "предаване на стоката или на документите";
-var words = search?.Split(' ').Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x) && x.Length >= 2).ToList();
 
-var result = context.Cases.Where(x=>x.Id != null);
 
-foreach (var word in words)
-{
-    result = context.Cases.Where(x => EF.Functions.FreeText(x.Content, word));
-    //// query = query.Where(x => x.SearchText.Contains(word));
-}
-var asdsa = result.ToList();
-Console.WriteLine("");
-//var allPdfBlocks = new List<string>();
-//using (var document = PdfDocument.Open(@"C:\Users\nnesh\source\repos\Web\MlTesting\ConsoleApp2\2604-2022.pdf"))
+//await parser.JudjeParseAsync("13.04.2021", "13.04.2021", reshenie, url);
+
+//var search = "предаване на стоката или на документите";
+//var words = search?.Split(' ').Select(x => x.Trim())
+//                .Where(x => !string.IsNullOrWhiteSpace(x) && x.Length >= 2).ToList();
+
+//var result = context.Cases.Where(x=>x.Id != null);
+
+//foreach (var word in words)
 //{
-//    for (var i = 0; i < document.NumberOfPages; i++)
-//    {
-//        var page = document.GetPage(i + 1);
-
-//        var words = page.GetWords(NearestNeighbourWordExtractor.Instance);
-//        var blocks = DocstrumBoundingBoxes.Instance.GetBlocks(words);
-
-//        var unsupervisedReadingOrderDetector = new UnsupervisedReadingOrderDetector(5);
-//        var orderedBlocks = unsupervisedReadingOrderDetector.Get(blocks);
-
-//        foreach (var block in orderedBlocks)
-//        {
-//            allPdfBlocks.Add(block.ToString());
-//        }
-
-//        foreach (var item in allPdfBlocks)
-//        {
-//            Console.WriteLine(item);
-//            Console.WriteLine("------", 60);
-//        }
-
-//    }
+//    result = context.Cases.Where(x => EF.Functions.FreeText(x.Content, word));
+//    //// query = query.Where(x => x.SearchText.Contains(word));
 //}
+
+
+
 
 void ResetDatabase(ApplicationDbContext context, bool shouldDropDatabase = false)
 {

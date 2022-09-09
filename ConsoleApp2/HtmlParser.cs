@@ -1,9 +1,12 @@
 ﻿using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using AngleSharp.Text;
 using Data;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Primitives;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ConsoleApp2
 {
@@ -41,22 +44,19 @@ namespace ConsoleApp2
 
                 if (anchor.Href != null && anchor.Href.Contains("https://portalextensions"))
                 {
-                    var right = anchor.TextContent;
-                    var motiv = "Мотиви";
-                    if (right.ToLower() != motiv.ToLower())
-                    {
-                        Console.WriteLine(anchor.TextContent);
-                        urls.Add(anchor.Href);
-                    }
+                    Console.WriteLine(anchor.TextContent);
+                    urls.Add(anchor.Href);
                 }
             }
             return urls;
         }
+       
+       
         public async Task JudjeParseAsync(string startDate, string endDate, string code, string urlAddress)
         {
             var files = new DownloadFiles();
             var url = String.Format(urlAddress, startDate, endDate, code);
-            var result = await files.Download(url);
+            var dowloadetFiles = await files.Download(url);
 
             string html = "";
             using (HttpClient client = new HttpClient())
@@ -83,22 +83,40 @@ namespace ConsoleApp2
 
                 if (counter == 10)
                 {
-                    if (!test[8].Contains("Свали"))
+                    if (!test[8].Contains("Свали", StringComparison.OrdinalIgnoreCase))
                     {
-
                         test = new List<string>();
                         counter = 0;
                     }
                     else
                     {
-                        var curent = result.Dequeue();
+                        var curent = dowloadetFiles.Dequeue();
                         var text = String.Empty;
                         var judje = this.context1.Judjes.FirstOrDefault(x => x.Name.ToLower() == test[5].Trim().ToLower());
+                        string motiv = null;
+                        string motivText = String.Empty;
+                        if (test[9].Contains("Мотиви", StringComparison.OrdinalIgnoreCase))
+                        {
+                            motiv = dowloadetFiles.Dequeue();
+                            if (motiv.Contains("html"))
+                            {
+                                motivText = HtmlParse(motiv);
+                            }
+                            else
+                            {
+                                motivText = PdfExtractor.GetFullText(motiv);
+                            }
+                            
+                            File.Delete(motiv);
+                        }
                         if (curent.Contains("html"))
                         {
                             text = HtmlParse(curent);
 
-                            int index = text.IndexOf("РЕШИ:");
+                            var index = GetIndex(text);
+                            var content = String.Empty;
+                            var answer = String.Empty;
+
                             if (index != -1)
                             {
                                 if (judje == null)
@@ -110,18 +128,27 @@ namespace ConsoleApp2
                                     };
                                     await this.context1.Judjes.AddAsync(judje);
                                 }
+                                content = text?.Substring(0, index).Trim();
+                                answer = text?.Substring(index).Trim();
+                      
+                                var answerTextReplace = PdfExtractor.ReplaceText(answer);
+                                var modifyAnswer = CharactersExtension.RemuveSpecialCharacters(answerTextReplace);
 
-                                var content = text?.Substring(0, index).Trim();
-                                var answer = text?.Substring(index).Trim();
+                                var modifyTextReplace = PdfExtractor.ReplaceText(content);
+                                var modifyContent = CharactersExtension.RemuveSpecialCharacters(modifyTextReplace);
+
                                 var newCase = new Case()
                                 {
                                     Id = Guid.NewGuid().ToString(),
                                     TypeOfCase = test[1],
                                     CaseNumber = test[2],
                                     TypeOfAct = test[6],
-                                    Content = content,
-                                    Answer = answer,
-                                    JudjeId = judje.Id
+                                    Content = modifyContent,
+                                    Answer = modifyAnswer,
+                                    JudjeId = judje.Id,
+                                    Decision = FindText(answer),
+                                    FullText = text,
+                                    Motives = motivText
                                 };
                                 counter = 0;
                                 await this.context1.Cases.AddAsync(newCase);
@@ -154,16 +181,25 @@ namespace ConsoleApp2
 
                                 var content = text?.Substring(0, index).Trim();
                                 var answer = text?.Substring(index).Trim();
+
+                                var answerTextReplace = PdfExtractor.ReplaceText(answer);
+                                var modifyAnswer = CharactersExtension.RemuveSpecialCharacters(answerTextReplace);
+
+                                var modifyTextReplace = PdfExtractor.ReplaceText(content);
+                                var modifyContent = CharactersExtension.RemuveSpecialCharacters(modifyTextReplace);
+
                                 var newCase = new Case()
                                 {
                                     Id = Guid.NewGuid().ToString(),
                                     TypeOfCase = test[1],
                                     CaseNumber = test[2],
                                     TypeOfAct = test[6],
-                                    Content = content,
-                                    Answer = answer,
+                                    Content = modifyContent,
+                                    Answer = modifyAnswer,
                                     JudjeId = judje.Id,
-                                    Decision = FindText(answer)
+                                    Decision = FindText(answer),
+                                    FullText = text,
+                                    Motives = motivText
                                 };
 
                                 counter = 0;
@@ -189,21 +225,53 @@ namespace ConsoleApp2
 
         public string HtmlParse(string url)
         {
+           
             var builder = new StringBuilder();
             HtmlDocument document = new HtmlDocument();
             string htmlCode = "";
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding encoding = Encoding.GetEncoding("windows-1251");
+            
             document.Load(url, encoding);
+            
             foreach (HtmlNode paragraph in document.DocumentNode.SelectNodes("//p"))
             {
-                htmlCode = paragraph.InnerText;
-
+                htmlCode = paragraph.InnerText.Trim();
+                htmlCode = htmlCode.Replace(System.Environment.NewLine, " ");
+                if (htmlCode.Length == 1)
+                {
+                    var chars = htmlCode.ToCharArray();
+                    if (chars[0].IsUppercaseAscii())
+                    {
+                        continue;
+                    }
+                }
                 builder.Append(htmlCode.Trim());
-                
+                builder.Append(" ");
+               
             }
-            var text = PdfExtractor.ReplaceText(builder.ToString());
+            var text = PdfExtractor.RemuveHtmlNewLine(builder.ToString());
+
+            //for test
+            var ext =PdfExtractor.ReplaceText(text);
+            var modifyContent = CharactersExtension.RemuveSpecialCharacters(ext);
+
             return text;
+        }
+        private int GetIndex(string text)
+        {
+            int index = -1;
+            var cases = new List<string>() { "РЕШИ", "Р Е Ш И", "Р  Е  Ш  И", "Р   Е   Ш   И" };
+            foreach (var item in cases)
+            {
+                if (text.Contains(item, StringComparison.OrdinalIgnoreCase))
+                {
+                    index = text.IndexOf(item);
+                    break;
+                }
+            }
+
+            return index;
         }
         private string FindText(string text)
         {
