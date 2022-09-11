@@ -98,7 +98,9 @@
         {
        
             var result = text;
+            result = Regex.Replace(result, @"[Р][ ]{1,}[Е][ ]{1,}[Ш][ ]{1,}[Е][ ]{1,}[Н][ ]{1,}[И][ ]{1,}[Е][ ]{1,}"," ");
             result = Regex.Replace(result, @"[0-3][0-9][.][0-1][0-9][.][0-9]{4}", " ");
+            result = Regex.Replace(result, @"[№][ ]{1,}[0-9]{1,}", " ");
             result = Regex.Replace(result, @"[{ЕГН{IsCyrillic}]+[ ]+[*]{2,}", " ");
             result = Regex.Replace(result, @"[Е{IsCyrillic}][Г{IsCyrillic}][Н{IsCyrillic}]", " ");
             result = Regex.Replace(result, @"[{А-Я}{IsCyrillic}]+[.]+[ ][{А-Я}{IsCyrillic}]+[.]+[ ][{А-Я}{IsCyrillic}]+[.]", " ");

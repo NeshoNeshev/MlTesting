@@ -24,7 +24,7 @@ namespace MLModel1_ConsoleApp121
             //Create a new pipeline for the english language, and add the WikiNER model to it
             Console.WriteLine("Loading models... This might take a bit longer the first time you run this sample, as the models have to be downloaded from the online repository");
             var nlp = await Pipeline.ForAsync(Language.English);
-            nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Version.Latest, tag: "WikiNER"));
+            nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Version.Latest,tag: "WikiNER"));
 
             //Друг наличен модел за NER е PatternSpotter, който е концептуалният еквивалент на RegEx върху необработен текст, но работи върху токенизираната форма извън текста.
             //Добавя персонализиран модел за наблюдение на шаблона: единичен("е" / глагол) + множествен(СЪЩ./AUX/PROPN/AUX/DET/ADJ)
@@ -89,6 +89,7 @@ namespace MLModel1_ConsoleApp121
             var docAboutProgramming = new Document(Data.SampleProgramming, Language.Bulgarian);
 
             nlp.ProcessSingle(docAboutProgramming);
+            
 
             PrintDocumentEntities(docAboutProgramming);
         }
@@ -104,7 +105,7 @@ namespace MLModel1_ConsoleApp121
             yield return new Document(Data.Sample_3, Language.English);
             yield return new Document(Data.Sample_4, Language.English);
         }
-        static IEnumerable<IDocument> GetDocs()
+        public static IEnumerable<IDocument> GetDocs()
         {
             yield return new Document(Data.Sample_6, Language.Bulgarian);
             yield return new Document(Data.Sample_7, Language.Bulgarian);
