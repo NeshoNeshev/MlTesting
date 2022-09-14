@@ -9,7 +9,55 @@ namespace MLModel1_ConsoleApp121
 
     public static class EntityRecognition
     {
+        public static async Task AveragePerceptronEntityRecognizerAndPatternSpotterSampleBulgarian()
+        {
+            Catalyst.Models.Bulgarian.Register();
+            var nlp = await Pipeline.ForAsync(Language.Bulgarian);
 
+            var isApattern = new PatternSpotter(Language.Bulgarian, 0, tag: "sda", captureTag: "asda");
+            isApattern.NewPattern(
+                "asdaasd",
+                mp => mp.Add(
+                    new PatternUnit(P.Single().WithToken("наложено").WithPOS(PartOfSpeech.VERB)),
+                     new PatternUnit(P.Multiple().WithPOS(
+                      
+                         PartOfSpeech.VERB, 
+                         PartOfSpeech.ADJ,
+                         PartOfSpeech.NOUN,
+                         PartOfSpeech.PUNCT,
+                         PartOfSpeech.ADP,
+                         PartOfSpeech.NUM
+                         ))
+            ));
+            nlp.Add(isApattern);
+            if (!File.Exists("my-pattern.bin"))
+            {
+                using (var f = File.OpenWrite("my-pattern.bin"))
+                {
+                    await isApattern.StoreAsync(f);
+                }
+            }
+
+
+            // Load the model back from disk
+            var isApattern2 = new PatternSpotter(Language.Bulgarian, 0, tag: "sda", captureTag: "asda");
+
+            using (var f = File.OpenRead("my-pattern.bin"))
+            {
+                await isApattern2.LoadAsync(f);
+            }
+            var docs = nlp.Process(GetDocs());
+
+            //Това ще отпечата всички разпознати обекти. Можете също да видите как моделът WikiNER прави грешка при разпознаването на Amazon като местоположение в Data.Sample_1
+            foreach (var doc in docs)
+            {
+                var words = doc.SelectMany(span => span.GetEntities()).Select(e => e.Value);
+
+                
+                Console.WriteLine($"Entities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
+            }
+            foreach (var d in docs) { PrintDocumentEntities(d); }
+        }
         public static async Task AveragePerceptronEntityRecognizerAndPatternSpotterSample()
         {
             Catalyst.Models.Bulgarian.Register();
@@ -24,7 +72,7 @@ namespace MLModel1_ConsoleApp121
             //Create a new pipeline for the english language, and add the WikiNER model to it
             Console.WriteLine("Loading models... This might take a bit longer the first time you run this sample, as the models have to be downloaded from the online repository");
             var nlp = await Pipeline.ForAsync(Language.English);
-            nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Version.Latest,tag: "WikiNER"));
+            //nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Version.Latest,tag: "wiki-word2vec"));
 
             //Друг наличен модел за NER е PatternSpotter, който е концептуалният еквивалент на RegEx върху необработен текст, но работи върху токенизираната форма извън текста.
             //Добавя персонализиран модел за наблюдение на шаблона: единичен("е" / глагол) + множествен(СЪЩ./AUX/PROPN/AUX/DET/ADJ)
@@ -44,7 +92,7 @@ namespace MLModel1_ConsoleApp121
 
             //За паралелна обработка на множество документи (т.е. многопоточност), можете да извикате nlp.Process на IEnumerable<IDocument> enumerable
             var docs = nlp.Process(MultipleDocuments());
-
+ 
             //Това ще отпечата всички разпознати обекти. Можете също да видите как моделът WikiNER прави грешка при разпознаването на Amazon като местоположение в Data.Sample_1
             PrintDocumentEntities(doc);
             foreach (var d in docs) { PrintDocumentEntities(d); }
@@ -89,7 +137,7 @@ namespace MLModel1_ConsoleApp121
             var docAboutProgramming = new Document(Data.SampleProgramming, Language.Bulgarian);
 
             nlp.ProcessSingle(docAboutProgramming);
-            
+            nlp.StoreAsync();
 
             PrintDocumentEntities(docAboutProgramming);
         }
@@ -105,12 +153,18 @@ namespace MLModel1_ConsoleApp121
             yield return new Document(Data.Sample_3, Language.English);
             yield return new Document(Data.Sample_4, Language.English);
         }
+        
         public static IEnumerable<IDocument> GetDocs()
         {
-            yield return new Document(Data.Sample_6, Language.Bulgarian);
-            yield return new Document(Data.Sample_7, Language.Bulgarian);
-            yield return new Document(Data.Sample_8, Language.Bulgarian);
-            yield return new Document(Data.Sample_9, Language.Bulgarian); ;
+            var docs = new List<IDocument>();
+            docs.Add(new Document(Data.Sample_6, Language.Bulgarian));
+            docs.Add(new Document(Data.Sample_9, Language.Bulgarian));
+            //yield return new Document(Data.Sample_6, Language.Bulgarian);
+            //yield return new Document(Data.Sample_7, Language.Bulgarian);
+            //yield return new Document(Data.Sample_8, Language.Bulgarian);
+            //yield return new Document(Data.Sample_9, Language.Bulgarian); 
+
+            return docs;
         }
     }
 }

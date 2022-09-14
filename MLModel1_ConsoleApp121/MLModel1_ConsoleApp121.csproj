@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Catalyst.Models.Bulgarian" Version="1.0.30952" />
     <PackageReference Include="Catalyst.Models.English" Version="1.0.30952" />
+    <PackageReference Include="HNSW" Version="1.0.21628" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.21.1" />

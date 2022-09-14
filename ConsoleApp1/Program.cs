@@ -30,7 +30,7 @@ static void TrainModel(string modelFile)
     DatabaseLoader loader = context.Data.CreateDatabaseLoader<CaseData>();
     string connectionString = @"Server=.;Database=TestMl;Trusted_Connection=True;MultipleActiveResultSets=true";
 
-    string sqlCommand = "SELECT  Decision, Answer,Content, TypeOfCase FROM Cases";
+    string sqlCommand = "SELECT Id, Decision, Answer,Content, TypeOfCase FROM Cases";
     
     DatabaseSource dbSource = new DatabaseSource(SqlClientFactory.Instance, connectionString, sqlCommand);
 
@@ -41,7 +41,7 @@ static void TrainModel(string modelFile)
     
     // Common data process configuration with pipeline data transformations
     Console.WriteLine("Map raw input data columns to ML.NET data");
-    var dataProcessPipeline = context.Transforms.Conversion.MapValueToKey("Label", nameof(CaseModel.Answer))
+    var dataProcessPipeline = context.Transforms.Conversion.MapValueToKey("Label", nameof(CaseModel.Id))
         .Append(context.Transforms.Text.FeaturizeText("Features", nameof(CaseModel.Content)));
 
     // Create the selected training algorithm/trainer
@@ -82,7 +82,7 @@ static void TestModel(string modelFile, string input, string type)
     var prediction = predictionEngine.Predict(new CaseModel { Content = input, TypeOfCase = type });
     Console.WriteLine(new string('-', 60));
     Console.WriteLine($"Content: {input}");
-    Console.WriteLine($"Prediction: {prediction.Answear}");
+    Console.WriteLine($"Prediction: {prediction.Id}");
     Console.WriteLine($"Score: {prediction.Score.Max()}");
     //foreach (var testData in testModelData)
     //{

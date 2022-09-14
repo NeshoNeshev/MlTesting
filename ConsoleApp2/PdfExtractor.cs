@@ -78,7 +78,7 @@
             }
            
             example = builder.ToString();
-            example = ReplaceText(example);
+            //example = ReplaceText(example);
 
 
             return example;
@@ -98,7 +98,7 @@
         {
        
             var result = text;
-            result = Regex.Replace(result, @"[Р][ ]{1,}[Е][ ]{1,}[Ш][ ]{1,}[Е][ ]{1,}[Н][ ]{1,}[И][ ]{1,}[Е][ ]{1,}"," ");
+            result = Regex.Replace(result, @"[Р][ ]{0,}[Е][ ]{0,}[Ш][ ]{0,}[Е][ ]{0,}[Н][ ]{0,}[И][ ]{0,}[Е][ ]{0,}", " ");
             result = Regex.Replace(result, @"[0-3][0-9][.][0-1][0-9][.][0-9]{4}", " ");
             result = Regex.Replace(result, @"[№][ ]{1,}[0-9]{1,}", " ");
             result = Regex.Replace(result, @"[{ЕГН{IsCyrillic}]+[ ]+[*]{2,}", " ");

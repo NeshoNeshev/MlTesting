@@ -1,17 +1,12 @@
 ﻿using Catalyst;
 using Catalyst.Models;
 using Mosaik.Core;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using Version = Mosaik.Core.Version;
-using P = Catalyst.PatternUnitPrototype;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MLModel1_ConsoleApp121;
 
-Catalyst.Models.Bulgarian.Register();
+Catalyst.Models.English.Register();
+
 
 
 
@@ -24,7 +19,17 @@ Console.OutputEncoding = Encoding.UTF8; ApplicationLogging.SetLoggerFactory(Logg
 
 Storage.Current = new DiskStorage("catalyst-models");
 
-await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSample();
+await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSampleBulgarian();
+
+
+//var nlp = await Pipeline.ForAsync(Language.English);
+//var ft = new FastText(Language.English, 0, "wiki-word2vec");
+//ft.Data.Type = FastText.ModelType.CBow;
+//ft.Data.Loss = FastText.LossType.NegativeSampling;
+//var doc = new Document(Data.Sample_9, Language.English);
+
+//ft.Train(nlp.Process(MultipleDocuments()));
+//await ft.StoreAsync();
 
 //var nlp = await Pipeline.ForAsync(Language.English);
 //var isApattern = new PatternSpotter(Language.English, 0, tag: "is-a-pattern", captureTag: "IsA");
@@ -86,11 +91,12 @@ await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSample
 
 static IEnumerable<IDocument> MultipleDocuments()
 {
+    yield return new Document(Data.Sample_1, Language.English);
     yield return new Document(Data.Sample_2, Language.English);
     yield return new Document(Data.Sample_3, Language.English);
-    yield return new Document(Data.Sample_4, Language.English);
 }
 void PrintDocumentEntities(IDocument doc)
 {
     Console.WriteLine($"Input text:\n\t'{doc.Value}'\n\nTokenized Value:\n\t'{doc.TokenizedValue(mergeEntities: true)}'\n\nEntities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
 }
+//.........................................................

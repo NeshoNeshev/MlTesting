@@ -9,6 +9,9 @@ namespace ConsoleApp1
 {
     public class CaseModel
     {
+        [LoadColumn(0)]
+        public string Id { get; set; }
+
         [LoadColumn(1)]
         public string TypeOfCase { get; set; }
 

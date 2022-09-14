@@ -253,8 +253,8 @@ namespace ConsoleApp2
             var text = PdfExtractor.RemuveHtmlNewLine(builder.ToString());
 
             //for test
-            var ext =PdfExtractor.ReplaceText(text);
-            var modifyContent = CharactersExtension.RemuveSpecialCharacters(ext);
+            //var ext =PdfExtractor.ReplaceText(text);
+            //var modifyContent = CharactersExtension.RemuveSpecialCharacters(ext);
 
             return text;
         }

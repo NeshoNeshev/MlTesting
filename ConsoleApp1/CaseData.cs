@@ -2,6 +2,8 @@
 {
     public class CaseData
     {
+        public string Id { get; set; }
+
         public string TypeOfCase { get; set; }
 
         public string Content { get; set; }

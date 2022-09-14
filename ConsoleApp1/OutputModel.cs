@@ -10,7 +10,7 @@ namespace ConsoleApp1
     public class OutputModel
     {
         [ColumnName("PredictedLabel")]
-        public string Answear { get; set; }
+        public string Id { get; set; }
 
         public float[] Score { get; set; }
     }
