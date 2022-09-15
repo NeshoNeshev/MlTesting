@@ -3,6 +3,7 @@ using Catalyst.Models;
 using Mosaik.Core;
 using Version = Mosaik.Core.Version;
 using P = Catalyst.PatternUnitPrototype;
+using Data;
 
 namespace MLModel1_ConsoleApp121
 {
@@ -18,34 +19,33 @@ namespace MLModel1_ConsoleApp121
             isApattern.NewPattern(
                 "asdaasd",
                 mp => mp.Add(
-                    new PatternUnit(P.Single().WithToken("наложено").WithPOS(PartOfSpeech.VERB)),
+                    new PatternUnit(P.Single().WithToken("наложена").WithPOS(PartOfSpeech.VERB)),
                      new PatternUnit(P.Multiple().WithPOS(
-                      
-                         PartOfSpeech.VERB, 
                          PartOfSpeech.ADJ,
                          PartOfSpeech.NOUN,
-                         PartOfSpeech.PUNCT,
                          PartOfSpeech.ADP,
                          PartOfSpeech.NUM
+
                          ))
+
             ));
             nlp.Add(isApattern);
-            if (!File.Exists("my-pattern.bin"))
-            {
-                using (var f = File.OpenWrite("my-pattern.bin"))
-                {
-                    await isApattern.StoreAsync(f);
-                }
-            }
+            //if (!File.Exists("nang.bin"))
+            //{
+            //    using (var f = File.OpenWrite("nang.bin"))
+            //    {
+            //        await isApattern.StoreAsync(f);
+            //    }
+            //}
 
 
-            // Load the model back from disk
-            var isApattern2 = new PatternSpotter(Language.Bulgarian, 0, tag: "sda", captureTag: "asda");
+            //// Load the model back from disk
+            //var isApattern2 = new PatternSpotter(Language.Bulgarian, 0, tag: "globa", captureTag: "Nglob");
 
-            using (var f = File.OpenRead("my-pattern.bin"))
-            {
-                await isApattern2.LoadAsync(f);
-            }
+            //using (var f = File.OpenRead("nang.bin"))
+            //{
+            //    await isApattern2.LoadAsync(f);
+            //}
             var docs = nlp.Process(GetDocs());
 
             //Това ще отпечата всички разпознати обекти. Можете също да видите как моделът WikiNER прави грешка при разпознаването на Amazon като местоположение в Data.Sample_1
@@ -56,7 +56,7 @@ namespace MLModel1_ConsoleApp121
                 
                 Console.WriteLine($"Entities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
             }
-            foreach (var d in docs) { PrintDocumentEntities(d); }
+            //foreach (var d in docs) { PrintDocumentEntities(d); }
         }
         public static async Task AveragePerceptronEntityRecognizerAndPatternSpotterSample()
         {
@@ -156,9 +156,16 @@ namespace MLModel1_ConsoleApp121
         
         public static IEnumerable<IDocument> GetDocs()
         {
+            var context = new ApplicationDbContext();
+            var list = context.Cases.Select(x => x.Answer).ToList();
+            
             var docs = new List<IDocument>();
+            //foreach (var item in list)
+            //{
+            //    docs.Add(new Document(item, Language.Bulgarian));
+            //}
             docs.Add(new Document(Data.Sample_6, Language.Bulgarian));
-            docs.Add(new Document(Data.Sample_9, Language.Bulgarian));
+            //docs.Add(new Document(Data.Sample_9, Language.Bulgarian));
             //yield return new Document(Data.Sample_6, Language.Bulgarian);
             //yield return new Document(Data.Sample_7, Language.Bulgarian);
             //yield return new Document(Data.Sample_8, Language.Bulgarian);

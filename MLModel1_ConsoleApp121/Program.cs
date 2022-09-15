@@ -89,14 +89,5 @@ await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSample
 
 
 
-static IEnumerable<IDocument> MultipleDocuments()
-{
-    yield return new Document(Data.Sample_1, Language.English);
-    yield return new Document(Data.Sample_2, Language.English);
-    yield return new Document(Data.Sample_3, Language.English);
-}
-void PrintDocumentEntities(IDocument doc)
-{
-    Console.WriteLine($"Input text:\n\t'{doc.Value}'\n\nTokenized Value:\n\t'{doc.TokenizedValue(mergeEntities: true)}'\n\nEntities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
-}
+
 //.........................................................
