@@ -4,8 +4,11 @@ using Mosaik.Core;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MLModel1_ConsoleApp121;
+using Data;
+using System.Linq.Expressions;
+using System.Diagnostics;
 
-Catalyst.Models.English.Register();
+Catalyst.Models.Bulgarian.Register();
 
 
 
@@ -19,9 +22,37 @@ Console.OutputEncoding = Encoding.UTF8; ApplicationLogging.SetLoggerFactory(Logg
 
 Storage.Current = new DiskStorage("catalyst-models");
 
-await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSampleBulgarian();
+//await EntityRecognition.AveragePerceptronEntityRecognizerAndPatternSpotterSampleBulgarian();
+var context = new ApplicationDbContext();
+var list = context.Cases.Select(x => x.Answer).ToList();
+var entrys = new List<string>() { "съхранение ", "данни", "работодателите" };
+var text = "съхранение данни работодателите";
+var documents = new List<Document>();
+var timer = new Stopwatch();
+timer.Start();
+foreach (var item in list)
+{
+    var result = await SpotterExtension.FindDocuments(text,item);
+    if (result.EntitiesCount < 2)
+    {
+        continue;
+    }
+    else
+    {
+        documents.Add(result);
+        //PrintDocumentEntities(result);
+    }
 
-
+}
+timer.Stop();
+TimeSpan timeTaken = timer.Elapsed;
+string foo = "Time taken: " + timeTaken.ToString(@"m\:ss\.fff");
+Console.WriteLine(foo);
+Console.WriteLine(documents.Count);
+static void PrintDocumentEntities(IDocument doc)
+{
+    Console.WriteLine($"Input text:\n\t'{doc.Value}'\n\nTokenized Value:\n\t'{doc.TokenizedValue(mergeEntities: true)}'\n\nEntities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
+}
 //var nlp = await Pipeline.ForAsync(Language.English);
 //var ft = new FastText(Language.English, 0, "wiki-word2vec");
 //ft.Data.Type = FastText.ModelType.CBow;

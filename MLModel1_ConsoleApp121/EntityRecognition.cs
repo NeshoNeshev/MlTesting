@@ -4,48 +4,51 @@ using Mosaik.Core;
 using Version = Mosaik.Core.Version;
 using P = Catalyst.PatternUnitPrototype;
 using Data;
+using Nito.Disposables;
 
 namespace MLModel1_ConsoleApp121
 {
 
     public static class EntityRecognition
     {
+       
         public static async Task AveragePerceptronEntityRecognizerAndPatternSpotterSampleBulgarian()
         {
             Catalyst.Models.Bulgarian.Register();
             var nlp = await Pipeline.ForAsync(Language.Bulgarian);
 
-            var isApattern = new PatternSpotter(Language.Bulgarian, 0, tag: "sda", captureTag: "asda");
+            var isApattern = new PatternSpotter(Language.Bulgarian, 0, tag: "ANG", captureTag: "ang");
             isApattern.NewPattern(
-                "asdaasd",
+                "adm-nakazanie-globa",
                 mp => mp.Add(
-                    new PatternUnit(P.Single().WithToken("наложена").WithPOS(PartOfSpeech.VERB)),
+                    new PatternUnit(P.Single().WithToken("наложено").WithPOS(PartOfSpeech.VERB)),
                      new PatternUnit(P.Multiple().WithPOS(
                          PartOfSpeech.ADJ,
                          PartOfSpeech.NOUN,
+                         PartOfSpeech.PUNCT,
                          PartOfSpeech.ADP,
                          PartOfSpeech.NUM
 
-                         ))
 
+                         ))
             ));
             nlp.Add(isApattern);
-            //if (!File.Exists("nang.bin"))
-            //{
-            //    using (var f = File.OpenWrite("nang.bin"))
-            //    {
-            //        await isApattern.StoreAsync(f);
-            //    }
-            //}
+            if (!File.Exists("adm-nakazanie-globa.bin"))
+            {
+                using (var f = File.OpenWrite("adm-nakazanie-globa.bin"))
+                {
+                    await isApattern.StoreAsync(f);
+                }
+            }
 
+            var isApattern1 = await LoadPatternAsync("ANG", "ang", "adm-nakazanie-globa");
 
-            //// Load the model back from disk
-            //var isApattern2 = new PatternSpotter(Language.Bulgarian, 0, tag: "globa", captureTag: "Nglob");
+            nlp.Add(isApattern1);
 
-            //using (var f = File.OpenRead("nang.bin"))
-            //{
-            //    await isApattern2.LoadAsync(f);
-            //}
+            // Load the model back from disk
+            var isApattern2 = await LoadPatternAsync("NGVR", "ngvr", "ngvr");
+
+            nlp.Add(isApattern2);
             var docs = nlp.Process(GetDocs());
 
             //Това ще отпечата всички разпознати обекти. Можете също да видите как моделът WikiNER прави грешка при разпознаването на Amazon като местоположение в Data.Sample_1
@@ -56,7 +59,18 @@ namespace MLModel1_ConsoleApp121
                 
                 Console.WriteLine($"Entities: \n{string.Join("\n", doc.SelectMany(span => span.GetEntities()).Select(e => $"\t{e.Value} [{e.EntityType.Type}]"))}");
             }
-            //foreach (var d in docs) { PrintDocumentEntities(d); }
+  
+        }
+        private static async Task<PatternSpotter> LoadPatternAsync(string tag, string captureTag, string fileName)
+        {
+            var isApattern = new PatternSpotter(Language.Bulgarian, 0, tag: tag, captureTag: captureTag);
+
+            using (var f = File.OpenRead($"{fileName}.bin"))
+            {
+                await isApattern.LoadAsync(f);
+            }
+
+            return isApattern;
         }
         public static async Task AveragePerceptronEntityRecognizerAndPatternSpotterSample()
         {
@@ -164,8 +178,9 @@ namespace MLModel1_ConsoleApp121
             //{
             //    docs.Add(new Document(item, Language.Bulgarian));
             //}
+            //docs.Add(new Document(Data.Sample_6, Language.Bulgarian));
+            docs.Add(new Document(Data.Sample_9, Language.Bulgarian));
             docs.Add(new Document(Data.Sample_6, Language.Bulgarian));
-            //docs.Add(new Document(Data.Sample_9, Language.Bulgarian));
             //yield return new Document(Data.Sample_6, Language.Bulgarian);
             //yield return new Document(Data.Sample_7, Language.Bulgarian);
             //yield return new Document(Data.Sample_8, Language.Bulgarian);
@@ -173,5 +188,6 @@ namespace MLModel1_ConsoleApp121
 
             return docs;
         }
+     
     }
 }

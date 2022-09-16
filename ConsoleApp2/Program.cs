@@ -10,8 +10,8 @@ var context = new ApplicationDbContext();
 
 var parser = new HtmlParser(context);
 
-//var url = "C:\\Users\\nnesh\\source\\repos\\Web\\MlTesting\\ConsoleApp2\\pdfs\\act_2021_4_13. (6).html";
-//parser.HtmlParse(url);
+var url = "C:\\Users\\nnesh\\source\\repos\\Web\\MlTesting\\ConsoleApp2\\pdfs\\act_2021_7_27..html";
+parser.HtmlParse(url);
 
 //string reshenie = "5001";
 //string prisada = "5003";

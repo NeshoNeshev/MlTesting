@@ -233,30 +233,48 @@ namespace ConsoleApp2
             Encoding encoding = Encoding.GetEncoding("windows-1251");
             
             document.Load(url, encoding);
-            
-            foreach (HtmlNode paragraph in document.DocumentNode.SelectNodes("//p"))
+            var text = document.DocumentNode.InnerText;
+            var result = PdfExtractor.RemuveHtmlNewLine(text).Split(" ",StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var item in result)
             {
-                htmlCode = paragraph.InnerText.Trim();
-                htmlCode = htmlCode.Replace(System.Environment.NewLine, " ");
-                if (htmlCode.Length == 1)
+                if (item == ";")
                 {
-                    var chars = htmlCode.ToCharArray();
-                    if (chars[0].IsUppercaseAscii())
-                    {
-                        continue;
-                    }
+                    continue;
                 }
-                builder.Append(htmlCode.Trim());
-                builder.Append(" ");
-               
+                else
+                {
+                    builder.Append(item);
+                    builder.Append(" ");
+                }
+                
             }
-            var text = PdfExtractor.RemuveHtmlNewLine(builder.ToString());
+            Console.WriteLine(builder.ToString());
+
+            //foreach (HtmlNode paragraph in document.DocumentNode.SelectNodes("//p"))
+            //{
+               
+            //    htmlCode = paragraph.InnerText.Trim();
+            //    htmlCode = htmlCode.Replace(System.Environment.NewLine, " ");
+            //    if (htmlCode.Length == 1)
+            //    {
+            //        var chars = htmlCode.ToCharArray();
+            //        if (chars[0].IsUppercaseAscii())
+            //        {
+            //            continue;
+            //        }
+            //    }
+            //    builder.Append(htmlCode.Trim());
+            //    builder.Append(" ");
+               
+            //}
+            //var text = PdfExtractor.RemuveHtmlNewLine(builder.ToString());
 
             //for test
             //var ext =PdfExtractor.ReplaceText(text);
             //var modifyContent = CharactersExtension.RemuveSpecialCharacters(ext);
 
-            return text;
+            return builder.ToString();
         }
         private int GetIndex(string text)
         {
